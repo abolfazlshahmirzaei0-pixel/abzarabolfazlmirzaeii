@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ابزار چندکاره - ابوالفضل شاهمیرزایی</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --accent-color: #ff9900;
+            --button-bg: #4caf50;
+            --button-hover: #43a047;
+            --text-dark: #333;
+            --text-light: #fff;
+            --background-color: #f0f8ff;
+            --container-bg: rgba(255, 255, 255, 0.95);
+            --border-radius: 12px;
+            --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Vazirmatn', sans-serif;
+            direction: rtl;
+            text-align: center;
+            color: var(--text-dark);
+            padding: 20px;
+        }
+
+        #live-date-time {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 400px;
+            max-width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #e0e0e0;
+            margin-top: 20px;
+        }
+
+        #welcome-section {
+            display: none;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: var(--container-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        #welcome-message {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        h1.title {
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .auth-form {
+            width: 100%;
+        }
+        .auth-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .auth-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .auth-form button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background-color: var(--button-bg);
+            color: var(--text-light);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .auth-form button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .mode-buttons {
+            display: flex;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: var(--container-bg);
+            border-radius: var(--border-radius);
+            padding: 5px;
+            flex-wrap: wrap;
+        }
+        .mode-buttons button {
+            flex: 1;
+            border: none;
+            background-color: transparent;
+            color: var(--text-dark);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-width: 100px;
+            margin: 2px;
+        }
+        .mode-buttons button.active {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+
+        .tool-content {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tool-content.active {
+            display: flex;
+        }
+
+        /* استایل‌های تایمر */
+        .time-display {
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+        .controls button {
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+        }
+        .controls button:active {
+            transform: translateY(1px);
+        }
+        #start-btn { background-color: var(--button-bg); color: var(--text-light); }
+        #start-btn:hover { background-color: var(--button-hover); }
+        #pause-btn { background-color: #ffc107; color: var(--text-dark); }
+        #pause-btn:hover { background-color: #e0a800; }
+        #reset-btn { background-color: #dc3545; color: var(--text-light); }
+        #reset-btn:hover { background-color: #c82333; }
+        
+        /* استایل جدید دکمه تنظیم زمان */
+        #timer-set-btn {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        #timer-set-btn:hover {
+            background-color: #4c8ae6;
+        }
+
+
+        /* استایل‌های ماشین‌حساب */
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+        .calculator-buttons button {
+            padding: 20px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .calculator-buttons button:hover {
+            background-color: #4c8ae6;
+        }
+        .operator {
+            background-color: var(--primary-color) !important;
+        }
+        .operator:hover {
+            background-color: #5d29b3 !important;
+        }
+        #equals {
+            background-color: var(--button-bg) !important;
+        }
+        #equals:hover {
+            background-color: var(--button-hover) !important;
+        }
+        #clear {
+            background-color: #f44336 !important;
+        }
+        #clear:hover {
+            background-color: #da190b !important;
+        }
+
+        /* استایل‌های ابزار یادداشت‌برداری */
+        .todo-input-container {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .todo-input-container input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        .todo-input-container button {
+            background-color: var(--button-bg);
+            color: var(--text-light);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        .todo-item.completed {
+            background-color: #9e9e9e;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .todo-item-text {
+            flex-grow: 1;
+            text-align: right;
+            margin-left: 10px;
+        }
+        .todo-item button {
+            background: none;
+            border: none;
+            color: #ffeb3b;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        /* استایل‌های ابزار تبدیل واحد */
+        .converter-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .converter-group {
+            width: 100%;
+        }
+        .converter-group label {
+            display: block;
+            text-align: right;
+            margin-bottom: 5px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .converter-group select, .converter-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        #converted-result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        /* استایل‌های بخش آب و هوا */
+        #weather-tool a {
+            text-decoration: none;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: var(--text-light);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            font-size: 1.5rem;
+            font-weight: 700;
+            transition: background-color 0.3s;
+        }
+        #weather-tool a:hover {
+            background-color: #cc7a00;
+        }
+
+        /* استایل‌های بخش نظرات */
+        .comments-container {
+            display: none;
+            width: 100%;
+            margin-top: 30px;
+        }
+        .comments-section {
+            width: 100%;
+            text-align: right;
+        }
+        #comment-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            margin-bottom: 10px;
+            resize: vertical;
+        }
+        .comment-item {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: right;
+            border-right: 4px solid var(--primary-color);
+            position: relative;
+        }
+        .comment-item h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+        .comment-item p {
+            margin: 5px 0 0;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        .comment-item .delete-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            color: #ffeb3b;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            opacity: 0;
+        }
+        .comment-item:hover .delete-btn {
+            opacity: 1;
+        }
+        
+        /* استایل‌های دکمه خروج */
+        #logout-section {
+            display: none;
+            width: 100%;
+            margin-top: 40px;
+            text-align: center;
+        }
+        #logout-btn {
+            background-color: #dc3545;
+            color: var(--text-light);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        #logout-btn:hover {
+            background-color: #c82333;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="welcome-section">
+        <p id="welcome-message"></p>
+    </div>
+    <div id="live-date-time"></div>
+
+    <div id="user-auth" class="container">
+        <h1 class="title">ورود به ابزارهای من</h1>
+        <form id="registration-form" class="auth-form">
+            <input type="text" id="firstName" placeholder="نام" required>
+            <input type="text" id="lastName" placeholder="نام خانوادگی" required>
+            <button type="submit">ورود</button>
+        </form>
+    </div>
+
+    <div id="main-tools" class="container" style="display:none;">
+        <h1 class="title">ابزارهای من</h1>
+        <div class="mode-buttons">
+            <button id="timer-btn" class="active">تایمر</button>
+            <button id="calculator-btn">ماشین حساب</button>
+            <button id="todo-btn">یادداشت‌برداری</button>
+            <button id="converter-btn">تبدیل واحد</button>
+            <button id="weather-btn">آب و هوا</button>
+        </div>
+        
+        <div id="timer-tool" class="tool-content active">
+            <input type="number" id="timer-input" placeholder="زمان (ثانیه)" min="1" value="60">
+            <button id="timer-set-btn">تنظیم زمان</button>
+            <div class="time-display">
+                <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+            </div>
+            <div class="controls">
+                <button id="start-btn">شروع</button>
+                <button id="pause-btn" style="display:none;">توقف</button>
+                <button id="reset-btn">ریست</button>
+            </div>
+        </div>
+
+        <div id="calculator-tool" class="tool-content">
+            <input type="text" id="calc-display" value="0" disabled>
+            <div class="calculator-buttons">
+                <button id="clear">C</button>
+                <button id="log">log</button>
+                <button id="sqrt">√</button>
+                <button id="power">x²</button>
+                <button>7</button>
+                <button>8</button>
+                <button>9</button>
+                <button class="operator">÷</button>
+                <button>4</button>
+                <button>5</button>
+                <button>6</button>
+                <button class="operator">×</button>
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button class="operator">-</button>
+                <button id="zero">0</button>
+                <button>.</button>
+                <button id="equals" class="operator">=</button>
+                <button class="operator">+</button>
+            </div>
+        </div>
+        
+        <div id="todo-tool" class="tool-content">
+            <div class="todo-input-container">
+                <input type="text" id="todo-input" placeholder="یادداشت خود را بنویسید...">
+                <button id="add-todo-btn">افزودن</button>
+            </div>
+            <ul id="todo-list" class="todo-list"></ul>
+        </div>
+
+        <div id="converter-tool" class="tool-content">
+            <div class="converter-container">
+                <div class="converter-group">
+                    <label for="conversion-type">نوع تبدیل:</label>
+                    <select id="conversion-type">
+                        <option value="length">طول</option>
+                        <option value="weight">وزن</option>
+                        <option value="temperature">دما</option>
+                        <option value="volume">حجم</option>
+                        <option value="speed">سرعت</option>
+                        <option value="area">مساحت</option>
+                        <option value="data">ذخیره‌سازی داده</option>
+                    </select>
+                </div>
+                <div class="converter-group">
+                    <label for="from-unit">از واحد:</label>
+                    <select id="from-unit"></select>
+                </div>
+                <div class="converter-group">
+                    <label for="to-unit">به واحد:</label>
+                    <select id="to-unit"></select>
+                </div>
+                <div class="converter-group">
+                    <label for="input-value">مقدار:</label>
+                    <input type="number" id="input-value" value="1">
+                </div>
+                <div id="converted-result"></div>
+            </div>
+        </div>
+        
+        <div id="weather-tool" class="tool-content">
+            <h3>مشاهده وضعیت آب و هوا</h3>
+            <p>برای مشاهده آخرین وضعیت آب و هوا، روی دکمه زیر کلیک کنید.</p>
+            <a href="https://weather-appabshah.onrender.com/" target="_blank">برو به سایت آب و هوا</a>
+        </div>
+    </div>
+    
+    <div id="comments-container" class="container">
+        <div class="comments-section">
+            <h3>نظرات کاربران</h3>
+            <form id="comment-form" class="auth-form">
+                <textarea id="comment-text" placeholder="نظر خود را بنویسید..." rows="4" required></textarea>
+                <button type="submit">ارسال نظر</button>
+            </form>
+            <div id="comments-list"></div>
+        </div>
+    </div>
+
+    <div id="logout-section">
+        <button id="logout-btn" onclick="logout()">خروج</button>
+    </div>
+
+    <div class="footer">
+        ساخته شده توسط ابوالفضل شاهمیرزایی سال ۱۴۰۴
+    </div>
+    <script>
+        // تابع برای نمایش تاریخ و ساعت زنده و دقیق با فرمت فارسی
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                weekday: 'long'
+            };
+            const formattedDate = new Intl.DateTimeFormat('fa-IR', options).format(now);
+            document.getElementById('live-date-time').textContent = formattedDate;
+        }
+
+        // هر یک ثانیه تابع را اجرا کنید
+        setInterval(updateDateTime, 1000);
+        // یک بار هم بلافاصله اجرا شود تا زمان نمایش داده شود
+        updateDateTime();
+
+
+        // User Authentication & General
+        const authForm = document.getElementById('registration-form');
+        const userAuthDiv = document.getElementById('user-auth');
+        const mainToolsDiv = document.getElementById('main-tools');
+        const welcomeSection = document.getElementById('welcome-section');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const commentsContainer = document.getElementById('comments-container');
+        const logoutSection = document.getElementById('logout-section');
+        const modeButtons = document.querySelectorAll('.mode-buttons button');
+        const toolContents = document.querySelectorAll('.tool-content');
+
+        function checkUser() {
+            const user = localStorage.getItem('user');
+            if (user) {
+                const userData = JSON.parse(user);
+                welcomeMessage.textContent = `خوش آمدید، ${userData.firstName} ${userData.lastName}`;
+                
+                userAuthDiv.style.display = 'none';
+                mainToolsDiv.style.display = 'flex';
+                welcomeSection.style.display = 'block';
+                commentsContainer.style.display = 'flex';
+                logoutSection.style.display = 'block';
+            } else {
+                userAuthDiv.style.display = 'flex';
+                mainToolsDiv.style.display = 'none';
+                welcomeSection.style.display = 'none';
+                commentsContainer.style.display = 'none';
+                logoutSection.style.display = 'none';
+            }
+        }
+        authForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const userData = { firstName, lastName };
+            localStorage.setItem('user', JSON.stringify(userData));
+            checkUser();
+            loadComments();
+            loadTodos();
+            
+            // اسکرول به بالای صفحه پس از ورود موفق
+            window.scrollTo(0, 0);
+        });
+        function logout() {
+            localStorage.removeItem('user');
+            checkUser();
+        }
+        checkUser();
+
+        // Timer Logic
+        const timerTool = document.getElementById('timer-tool');
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const hoursSpan = document.getElementById('hours');
+        const minutesSpan = document.getElementById('minutes');
+        const secondsSpan = document.getElementById('seconds');
+        const timerInput = document.getElementById('timer-input');
+        const timerSetBtn = document.getElementById('timer-set-btn');
+        let intervalId;
+        let timeInSeconds = 0;
+        let timerDuration = 60;
+
+        function updateDisplay() {
+            const h = Math.floor(timeInSeconds / 3600);
+            const m = Math.floor((timeInSeconds % 3600) / 60);
+            const s = timeInSeconds % 60;
+            hoursSpan.textContent = String(h).padStart(2, '0');
+            minutesSpan.textContent = String(m).padStart(2, '0');
+            secondsSpan.textContent = String(s).padStart(2, '0');
+        }
+        function startTimer() {
+            if (timeInSeconds <= 0) {
+                 timeInSeconds = timerDuration;
+                 updateDisplay();
+            }
+            intervalId = setInterval(() => {
+                if (timeInSeconds > 0) {
+                    timeInSeconds--;
+                    updateDisplay();
+                } else {
+                    clearInterval(intervalId);
+                    alert("زمان به پایان رسید!");
+                    resetTimer();
+                }
+            }, 1000);
+        }
+        function resetTimer() {
+            clearInterval(intervalId);
+            timeInSeconds = timerDuration;
+            updateDisplay();
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+        }
+        startBtn.addEventListener('click', () => {
+            startTimer();
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+        });
+        pauseBtn.addEventListener('click', () => {
+            clearInterval(intervalId);
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+        });
+        resetBtn.addEventListener('click', () => {
+            resetTimer();
+        });
+        timerSetBtn.addEventListener('click', () => {
+            timerDuration = parseInt(timerInput.value) || 60;
+            resetTimer();
+        });
+
+        // Calculator Logic
+        const calcDisplay = document.getElementById('calc-display');
+        const calcButtons = document.querySelectorAll('.calculator-buttons button');
+        let currentInput = '';
+        let operator = null;
+        let firstOperand = null;
+
+        calcButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const value = button.textContent;
+                if (!isNaN(value) || value === '.') {
+                    currentInput += value;
+                    calcDisplay.value = currentInput;
+                } else if (value === 'C') {
+                    currentInput = '';
+                    operator = null;
+                    firstOperand = null;
+                    calcDisplay.value = '0';
+                } else if (value === '√') {
+                    const result = Math.sqrt(parseFloat(currentInput));
+                    calcDisplay.value = result;
+                    currentInput = result.toString();
+                } else if (value === 'x²') {
+                    const result = Math.pow(parseFloat(currentInput), 2);
+                    calcDisplay.value = result;
+                    currentInput = result.toString();
+                } else if (value === 'log') {
+                    const result = Math.log10(parseFloat(currentInput));
+                    calcDisplay.value = result;
+                    currentInput = result.toString();
+                } else if (value === '=') {
+                    const secondOperand = parseFloat(currentInput);
+                    let result;
+                    if (operator === '+') result = firstOperand + secondOperand;
+                    if (operator === '-') result = firstOperand - secondOperand;
+                    if (operator === '×') result = firstOperand * secondOperand;
+                    if (operator === '÷') result = firstOperand / secondOperand;
+                    calcDisplay.value = result;
+                    currentInput = result.toString();
+                    operator = null;
+                    firstOperand = null;
+                } else { // Operator
+                    firstOperand = parseFloat(currentInput);
+                    operator = value;
+                    currentInput = '';
+                }
+            });
+        });
+
+        // To-Do List Logic
+        const todoInput = document.getElementById('todo-input');
+        const addTodoBtn = document.getElementById('add-todo-btn');
+        const todoList = document.getElementById('todo-list');
+
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(Array.from(todoList.children).map(li => ({
+                text: li.querySelector('.todo-item-text').textContent,
+                completed: li.classList.contains('completed')
+            }))));
+        }
+
+        function loadTodos() {
+            const todos = JSON.parse(localStorage.getItem('todos')) || [];
+            todoList.innerHTML = '';
+            todos.forEach(todo => addTodoElement(todo.text, todo.completed));
+        }
+
+        function addTodoElement(text, completed = false) {
+            const li = document.createElement('li');
+            li.className = 'todo-item';
+            if (completed) {
+                li.classList.add('completed');
+            }
+            li.innerHTML = `
+                <span class="todo-item-text">${text}</span>
+                <button class="delete-btn" onclick="this.parentElement.remove(); saveTodos();">&#10005;</button>
+            `;
+            li.querySelector('.todo-item-text').addEventListener('click', () => {
+                li.classList.toggle('completed');
+                saveTodos();
+            });
+            todoList.appendChild(li);
+        }
+
+        addTodoBtn.addEventListener('click', () => {
+            const todoText = todoInput.value.trim();
+            if (todoText !== '') {
+                addTodoElement(todoText);
+                todoInput.value = '';
+                saveTodos();
+            }
+        });
+        todoInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                addTodoBtn.click();
+            }
+        });
+
+        // Unit Converter Logic
+        const conversionTypeSelect = document.getElementById('conversion-type');
+        const fromUnitSelect = document.getElementById('from-unit');
+        const toUnitSelect = document.getElementById('to-unit');
+        const inputValue = document.getElementById('input-value');
+        const convertedResult = document.getElementById('converted-result');
+
+        const conversions = {
+            length: {
+                meter: {name: 'متر', to_base: 1},
+                kilometer: {name: 'کیلومتر', to_base: 1000},
+                centimeter: {name: 'سانتی‌متر', to_base: 0.01},
+                millimeter: {name: 'میلی‌متر', to_base: 0.001},
+                micrometer: {name: 'میکرومتر', to_base: 0.000001},
+                nanometer: {name: 'نانومتر', to_base: 0.000000001},
+                inch: {name: 'اینچ', to_base: 0.0254},
+                foot: {name: 'فوت', to_base: 0.3048},
+                yard: {name: 'یارد', to_base: 0.9144},
+                mile: {name: 'مایل', to_base: 1609.34}
+            },
+            weight: {
+                kilogram: {name: 'کیلوگرم', to_base: 1},
+                gram: {name: 'گرم', to_base: 0.001},
+                milligram: {name: 'میلی‌گرم', to_base: 0.000001},
+                tonne: {name: 'تن', to_base: 1000},
+                pound: {name: 'پوند', to_base: 0.453592},
+                ounce: {name: 'اونس', to_base: 0.0283495},
+                carat: {name: 'قیراط', to_base: 0.0002}
+            },
+            temperature: {
+                celsius: {name: 'سلسیوس'},
+                fahrenheit: {name: 'فارنهایت'},
+                kelvin: {name: 'کلوین'}
+            },
+            volume: {
+                liter: {name: 'لیتر', to_base: 1},
+                milliliter: {name: 'میلی‌لیتر', to_base: 0.001},
+                cubic_meter: {name: 'متر مکعب', to_base: 1000},
+                gallon: {name: 'گالن', to_base: 3.78541},
+                cup: {name: 'فنجان', to_base: 0.236588},
+                tablespoon: {name: 'قاشق غذاخوری', to_base: 0.0147868},
+                teaspoon: {name: 'قاشق چای‌خوری', to_base: 0.00492892}
+            },
+            speed: {
+                meter_per_second: {name: 'متر بر ثانیه', to_base: 1},
+                kilometer_per_hour: {name: 'کیلومتر بر ساعت', to_base: 0.277778},
+                mile_per_hour: {name: 'مایل بر ساعت', to_base: 0.44704},
+                knot: {name: 'گره', to_base: 0.514444}
+            },
+            area: {
+                square_meter: {name: 'مترمربع', to_base: 1},
+                square_kilometer: {name: 'کیلومترمربع', to_base: 1000000},
+                square_foot: {name: 'فوت مربع', to_base: 0.092903},
+                acre: {name: 'جریب', to_base: 4046.86},
+                hectare: {name: 'هکتار', to_base: 10000},
+                square_inch: {name: 'اینچ مربع', to_base: 0.00064516},
+                square_yard: {name: 'یارد مربع', to_base: 0.836127}
+            },
+            data: {
+                bit: {name: 'بیت', to_base: 1},
+                byte: {name: 'بایت', to_base: 8},
+                kilobit: {name: 'کیلوبیت', to_base: 1024},
+                kilobyte: {name: 'کیلوبایت', to_base: 8192},
+                megabit: {name: 'مگابیت', to_base: 1048576},
+                megabyte: {name: 'مگابایت', to_base: 8388608},
+                gigabit: {name: 'گیگابیت', to_base: 1073741824},
+                gigabyte: {name: 'گیگابایت', to_base: 8589934592},
+                terabit: {name: 'ترابیت', to_base: 1099511627776},
+                terabyte: {name: 'ترابایت', to_base: 8796093022208}
+            }
+        };
+
+        function populateUnits() {
+            const type = conversionTypeSelect.value;
+            const units = Object.keys(conversions[type]);
+            fromUnitSelect.innerHTML = '';
+            toUnitSelect.innerHTML = '';
+            units.forEach(unit => {
+                const optionFrom = document.createElement('option');
+                optionFrom.value = unit;
+                optionFrom.textContent = conversions[type][unit].name;
+                fromUnitSelect.appendChild(optionFrom);
+
+                const optionTo = document.createElement('option');
+                optionTo.value = unit;
+                optionTo.textContent = conversions[type][unit].name;
+                toUnitSelect.appendChild(optionTo);
+            });
+            convertValue();
+        }
+
+        function convertValue() {
+            const type = conversionTypeSelect.value;
+            const fromUnit = fromUnitSelect.value;
+            const toUnit = toUnitSelect.value;
+            let value = parseFloat(inputValue.value);
+
+            if (isNaN(value)) {
+                convertedResult.textContent = 'لطفا یک عدد وارد کنید.';
+                return;
+            }
+
+            let result;
+            if (type === 'temperature') {
+                if (fromUnit === toUnit) {
+                    result = value;
+                } else if (fromUnit === 'celsius' && toUnit === 'fahrenheit') {
+                    result = (value * 9/5) + 32;
+                } else if (fromUnit === 'fahrenheit' && toUnit === 'celsius') {
+                    result = (value - 32) * 5/9;
+                } else if (fromUnit === 'celsius' && toUnit === 'kelvin') {
+                    result = value + 273.15;
+                } else if (fromUnit === 'kelvin' && toUnit === 'celsius') {
+                    result = value - 273.15;
+                } else if (fromUnit === 'fahrenheit' && toUnit === 'kelvin') {
+                    result = (value - 32) * 5/9 + 273.15;
+                } else if (fromUnit === 'kelvin' && toUnit === 'fahrenheit') {
+                    result = (value - 273.15) * 9/5 + 32;
+                }
+            } else {
+                const baseValue = value * conversions[type][fromUnit].to_base;
+                result = baseValue / conversions[type][toUnit].to_base;
+            }
+
+            convertedResult.textContent = `${value} ${conversions[type][fromUnit].name} = ${result.toFixed(2)} ${conversions[type][toUnit].name}`;
+        }
+
+        conversionTypeSelect.addEventListener('change', populateUnits);
+        fromUnitSelect.addEventListener('change', convertValue);
+        toUnitSelect.addEventListener('change', convertValue);
+        inputValue.addEventListener('input', convertValue);
+        populateUnits();
+
+        // Toggle between Tools
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modeButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                toolContents.forEach(content => content.classList.remove('active'));
+                const targetTool = document.getElementById(button.id.replace('-btn', '-tool'));
+                if (targetTool) {
+                    targetTool.classList.add('active');
+                }
+            });
+        });
+
+        // Comments Section Logic
+        const commentForm = document.getElementById('comment-form');
+        const commentText = document.getElementById('comment-text');
+        const commentsList = document.getElementById('comments-list');
+
+        function loadComments() {
+            const comments = JSON.parse(localStorage.getItem('comments')) || [];
+            commentsList.innerHTML = '';
+            comments.forEach((comment, index) => {
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment-item');
+                commentDiv.innerHTML = `
+                    <h4>${comment.name}</h4>
+                    <p>${comment.text}</p>
+                    <button class="delete-btn" data-index="${index}">&#10005;</button>
+                `;
+                commentsList.appendChild(commentDiv);
+            });
+        }
+        commentForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userName = user ? `${user.firstName} ${user.lastName}` : 'کاربر مهمان';
+            const comments = JSON.parse(localStorage.getItem('comments')) || [];
+            comments.push({ name: userName, text: commentText.value });
+            localStorage.setItem('comments', JSON.stringify(comments));
+            commentText.value = '';
+            loadComments();
+        });
+        commentsList.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-btn')) {
+                const indexToDelete = event.target.getAttribute('data-index');
+                const comments = JSON.parse(localStorage.getItem('comments')) || [];
+                comments.splice(indexToDelete, 1);
+                localStorage.setItem('comments', JSON.stringify(comments));
+                loadComments();
+            }
+        });
+
+        // Initial loads
+        resetTimer();
+        loadComments();
+        loadTodos();
+    </script>
+</body>
+</html>
